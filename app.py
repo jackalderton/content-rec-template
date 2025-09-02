@@ -5,7 +5,8 @@ from datetime import datetime
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 from pathlib import Path
-
+import datetime
+import pytz
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup, Tag, NavigableString, Comment, Doctype, ProcessingInstruction
@@ -739,8 +740,10 @@ if st.session_state.single_docx:
         key="dl_single_docx",
     )
 # --- VERSION FOOTER ---
-import datetime
-
+def uk_today_str() -> str:
+    tz = pytz.timezone("Europe/London")
+    return datetime.now(tz).strftime(DATE_FMT)
+    
 def get_version_info() -> str:
     try:
         with open("VERSION.txt", "r") as f:
