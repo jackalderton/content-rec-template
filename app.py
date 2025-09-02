@@ -25,19 +25,6 @@ st.set_page_config(
     page_icon=str(icon_path) if icon_path else "🧩",
     layout="wide",
 )
-# --- SIMPLE PASSWORD LOGIN ---
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
-
-if not st.session_state["authenticated"]:
-    st.title("🔒 Login Required")
-    password = st.text_input("Enter password:", type="password")
-    if password == st.secrets["general"]["password"]:
-        st.session_state["authenticated"] = True
-        st.experimental_rerun()
-    elif password:
-        st.error("Incorrect password.")
-    st.stop()
 
 # =========================================================
 # CONSTANTS / SETTINGS
