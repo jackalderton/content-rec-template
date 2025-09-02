@@ -738,3 +738,16 @@ if st.session_state.single_docx:
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         key="dl_single_docx",
     )
+# --- VERSION FOOTER ---
+import datetime
+
+def get_version_info() -> str:
+    try:
+        with open("VERSION.txt", "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return "unknown version"
+
+with st.sidebar:
+    st.markdown("---")
+    st.caption(f"Last edited: **{uk_today_str()}**, version `{get_version_info()}`")
