@@ -742,7 +742,7 @@ if st.session_state.single_docx:
 # --- VERSION FOOTER ---
 def uk_today_str() -> str:
     tz = pytz.timezone("Europe/London")
-    return datetime.now(tz).strftime(DATE_FMT)
+    return datetime.datetime.now(tz).strftime(DATE_FMT)
     
 def get_version_info() -> str:
     try:
