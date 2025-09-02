@@ -614,7 +614,7 @@ st.markdown(
     "h1, h2, h3 { color: #537DFC !important; }\n"
     "\n"
     "/* Sidebar look + width */\n"
-    "[data-testid=\"stSidebar\"] { background-color: #1a1e24; border-right: 1px solid #4A90E2; min-width: 320px; max-width: 420px; }\n"
+    "[data-testid=\"stSidebar\"] { background-color: #1a1e24; border-right: 1px solid #4A90E2; min-width: 400px; max-width: 6000px; }\n"
     "\n"
     "/* Expander headers */\n"
     "[data-testid=\"stExpander\"] [data-testid=\"stExpanderHeader\"] { background-color: #363945; border-radius: 8px; padding: 10px 15px; margin-bottom: 10px; border: none; font-weight: bold; color: #E0E0E0; }\n"
