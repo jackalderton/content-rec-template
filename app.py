@@ -632,7 +632,7 @@ st.markdown(
 # =========================================================
 # APP UI (Single URL only)
 # =========================================================
-st.title("Content Recommendation: Automatic Population")
+st.title("Content Recommendations: Automatic Population")
 
 # stable downloads across reruns
 if "single_docx" not in st.session_state:
