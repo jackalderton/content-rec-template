@@ -753,7 +753,7 @@ def get_version_info() -> str:
 
 with st.sidebar:
     st.markdown("---")
-    st.caption(f"Application Info: `{get_version_info()}`")
+    st.caption(f"Version: `{get_version_info()}`")
     st.markdown(
         """
         <a href="mailto:jack.alderton@crafted.co.uk" style="text-decoration:none;">
