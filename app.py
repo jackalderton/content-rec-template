@@ -1,7 +1,6 @@
 import io
 import re
 import json
-from datetime import datetime
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -73,7 +72,8 @@ NOISE_SUBSTRINGS = (
 # UTILS
 # =========================================================
 def uk_today_str() -> str:
-    return datetime.now(ZoneInfo(DATE_TZ)).strftime(DATE_FMT)
+    tz = pytz.timezone("Europe/London")
+    return datetime.datetime.now(tz).strftime(DATE_FMT)
 
 def clean_slug_to_name(slug: str) -> str:
     return slug.replace("-", " ").strip().title()
