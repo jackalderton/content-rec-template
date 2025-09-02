@@ -753,4 +753,4 @@ def get_version_info() -> str:
 
 with st.sidebar:
     st.markdown("---")
-    st.caption(f"Last edited: **{uk_today_str()}**, version `{get_version_info()}`")
+    st.caption(f"Application Info: `{get_version_info()}`")
