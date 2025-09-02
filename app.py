@@ -754,3 +754,4 @@ def get_version_info() -> str:
 with st.sidebar:
     st.markdown("---")
     st.caption(f"Application Info: `{get_version_info()}`")
+    st.caption(f"jack.alderton@crafted.co.uk")
