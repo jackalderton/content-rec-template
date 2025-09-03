@@ -684,47 +684,41 @@ with st.sidebar:
 st.markdown("#### Optional Keywords")
 st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
-
 # Ensure keywords_list is in session_state
 if "keywords_list" not in st.session_state:
-st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
+    st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
 
-
-# Work from current session state
+# Prepare updated list
 keywords = st.session_state.keywords_list
 new_keywords = []
 
-
-# Render keyword rows
+# Render keyword input rows
 for idx, pair in enumerate(keywords):
-col1, col2, col3 = st.columns([4, 1.5, 0.5])
-with col1:
-kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
-with col2:
-vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
-with col3:
-st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
-if st.button("➖", key=f"remove_{idx}"):
-continue # Skip this row if removed
-new_keywords.append({"keyword": kw, "volume": vol})
+    col1, col2, col3 = st.columns([4, 1, 0.5])
+    with col1:
+        kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
+    with col2:
+        vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
+    with col3:
+        st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
+        if st.button("➖", key=f"remove_{idx}"):
+            continue  # Skip this row if removed
+    new_keywords.append({"keyword": kw, "volume": vol})
 
-
-# Add row button LAST for layout consistency
-st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
-if st.button("➕ Add Keyword Row", key="add_kw_row"):
-new_keywords.append({"keyword": "", "volume": ""})
-st.markdown("</div>", unsafe_allow_html=True)
-
+# Render add row button separately for alignment
+col_add = st.columns([5])[0]
+with col_add:
+    if st.button("➕ Add Keyword Row", key="add_kw_row"):
+        new_keywords.append({"keyword": "", "volume": ""})
 
 # Update session state
 st.session_state.keywords_list = new_keywords
 
-
 # Format final string
 formatted_keywords = ", ".join(
-f"{item['keyword']} ({item['volume']})"
-for item in new_keywords
-if item['keyword'].strip() and item['volume'].strip()
+    f"{item['keyword']} ({item['volume']})"
+    for item in new_keywords
+    if item['keyword'].strip() and item['volume'].strip()
 )
 
 # Agency / Client fields just above the URL field
