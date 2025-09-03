@@ -433,6 +433,7 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
         "[DESCRIPTION LENGTH]": str(meta.get("description_len", 0)),
         "[AGENCY]": meta.get("agency", ""),
         "[CLIENT NAME]": meta.get("client_name", ""),
+        "[KEYWORDS]": meta.get("keywords", ""),
     })
     # Main content
     replace_placeholder_with_lines(doc, "[PAGE BODY CONTENT]", lines)
