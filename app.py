@@ -682,12 +682,13 @@ with st.sidebar:
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
 # Optional: Version display at the bottom of the sidebar
-    st.markdown("---")
     try:
-        from src._version import get_version_info  # Adjust path if needed
-        st.caption(f"Version: `{get_version_info()}`")
-    except Exception:
-        st.caption("Version: dev")
+    with open("VERSION.txt", "r") as f:
+        version = f.read().strip()
+    st.caption(f"Application Info: `{version}`")
+except Exception:
+    st.caption("Version: dev")
+
 
 
 with st.expander("Add Keywords (BETA)", expanded=False):
