@@ -633,7 +633,7 @@ st.markdown(
 # =========================================================
 # APP UI (Single URL only)
 # =========================================================
-st.title("Content Rec Auto Populator")
+st.title("Recmatic")
 
 # stable downloads across reruns
 if "single_docx" not in st.session_state:
