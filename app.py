@@ -684,37 +684,32 @@ with st.sidebar:
 st.markdown("#### Optional Keywords")
 st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
-# Ensure keywords_list is in session_state
-if "keywords_list" not in st.session_state:
-    st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
+# Step 1: Get desired row count
+default_row_count = len(st.session_state.get("keywords_list", [])) or 1
+row_count = st.number_input("How many keyword rows?", min_value=1, max_value=100, step=1, value=default_row_count)
 
-# Prepare updated list
-keywords = st.session_state.keywords_list
+# Step 2: Update session state with correct number of rows
+existing = st.session_state.get("keywords_list", [])
+while len(existing) < row_count:
+    existing.append({"keyword": "", "volume": ""})
+if len(existing) > row_count:
+    existing = existing[:row_count]
+st.session_state.keywords_list = existing
+
+# Step 3: Render input fields
 new_keywords = []
-
-# Render keyword input rows
-for idx, pair in enumerate(keywords):
-    col1, col2, col3 = st.columns([4, 1, 0.5])
+for idx, pair in enumerate(st.session_state.keywords_list):
+    col1, col2 = st.columns([3, 1])
     with col1:
         kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
     with col2:
         vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
-    with col3:
-        st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
-        if st.button("➖", key=f"remove_{idx}"):
-            continue  # Skip this row if removed
     new_keywords.append({"keyword": kw, "volume": vol})
 
-# Render add row button separately for alignment
-col_add = st.columns([5])[0]
-with col_add:
-    if st.button("➕ Add Keyword Row", key="add_kw_row"):
-        new_keywords.append({"keyword": "", "volume": ""})
-
-# Update session state
+# Step 4: Update final list
 st.session_state.keywords_list = new_keywords
 
-# Format final string
+# Step 5: Format for template
 formatted_keywords = ", ".join(
     f"{item['keyword']} ({item['volume']})"
     for item in new_keywords
