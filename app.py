@@ -783,6 +783,8 @@ if do_preview or do_doc:
 
                 st.session_state.single_docx = out_bytes
                 st.session_state.single_docx_name = fname
+            except Exception as e:
+                st.exception(e)
 
 
 # render download button if we have a generated file
