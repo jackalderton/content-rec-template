@@ -683,11 +683,11 @@ with st.sidebar:
 
 # Optional: Version display at the bottom of the sidebar
     try:
-    with open("VERSION.txt", "r") as f:
-        version = f.read().strip()
-    st.caption(f"Application Info: `{version}`")
-except Exception:
-    st.caption("Version: dev")
+        with open("VERSION.txt", "r") as f:
+            version = f.read().strip()
+        st.caption(f"Application Info: `{version}`")
+    except Exception:
+        st.caption("Version: dev")
 
 
 
