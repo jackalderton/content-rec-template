@@ -21,7 +21,7 @@ ICON_CANDIDATES = [APP_DIR / "assets" / "JAFavicon.png", APP_DIR / "JAFavicon.pn
 icon_path = next((p for p in ICON_CANDIDATES if p.exists()), None)
 
 st.set_page_config(
-    page_title="Content Rec Template Tool",
+    page_title="Recmatic - Generate Rec Templates Instantly",
     page_icon=str(icon_path) if icon_path else "🧩",
     layout="wide",
 )
