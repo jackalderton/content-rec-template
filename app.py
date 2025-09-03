@@ -687,12 +687,19 @@ st.subheader("Page Details")
 st.markdown("#### Optional Keywords")
 st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
+# Ensure keywords_list is in session_state
 if "keywords_list" not in st.session_state:
     st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
 
+# Add row button FIRST (to trigger before rendering inputs)
+if st.button("➕ Add Row", key="add_kw_row"):
+    st.session_state.keywords_list.append({"keyword": "", "volume": ""})
+
+# Work from current session state
 keywords = st.session_state.keywords_list
 new_keywords = []
 
+# Render keyword rows
 for idx, pair in enumerate(keywords):
     col1, col2, col3 = st.columns([4, 1, 0.5])
     with col1:
@@ -700,18 +707,15 @@ for idx, pair in enumerate(keywords):
     with col2:
         vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
     with col3:
-        st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)  # Push button down
+        st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
         if st.button("➖", key=f"remove_{idx}"):
-            continue
-
-
-if st.button("➕", key="add_kw_row"):
-    new_keywords.append({"keyword": "", "volume": ""})
+            continue  # Skip this row if removed
+    new_keywords.append({"keyword": kw, "volume": vol})
 
 # Update session state
 st.session_state.keywords_list = new_keywords
 
-# Final keyword formatting
+# Format final string
 formatted_keywords = ", ".join(
     f"{item['keyword']} ({item['volume']})"
     for item in new_keywords
