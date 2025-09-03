@@ -687,55 +687,35 @@ st.subheader("Page Details")
 st.markdown("#### Optional Keywords")
 st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
-# Init state
 if "keywords_list" not in st.session_state:
     st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
 
 keywords = st.session_state.keywords_list
 new_keywords = []
 
-# Define SVG icons
-svg_add = '<svg width="16" height="16" viewBox="0 0 16 16" fill="#E0E0E0" xmlns="http://www.w3.org/2000/svg"><path d="M8 1v14M1 8h14" stroke="#E0E0E0" stroke-width="2" stroke-linecap="round"/></svg>'
-svg_remove = '<svg width="16" height="16" viewBox="0 0 16 16" fill="#E0E0E0" xmlns="http://www.w3.org/2000/svg"><path d="M1 8h14" stroke="#E0E0E0" stroke-width="2" stroke-linecap="round"/></svg>'
-
 for idx, pair in enumerate(keywords):
-    col1, col2, col3 = st.columns([3, 1.2, 0.2])
+    col1, col2, col3 = st.columns([3, 1.2, 0.4])
     with col1:
         kw = st.text_input(f"Keyword {idx+1}", value=pair["keyword"], key=f"kw_{idx}")
     with col2:
         vol = st.text_input("Vol", value=pair["volume"], key=f"vol_{idx}")
     with col3:
-        remove_btn = st.button("", key=f"remove_{idx}")
-        st.markdown(f"""
-            <div style="display: flex; justify-content: center; align-items: center; height: 38px;">
-                <form action="" method="post">
-                    <button type="submit" name="remove_{idx}" style="background: #2C2B3C; border: 1px solid #537DFC; padding: 4px 6px; border-radius: 6px; cursor: pointer;">
-                        {svg_remove}
-                    </button>
-                </form>
-            </div>
-        """, unsafe_allow_html=True)
-        if remove_btn:
-            continue
+        if st.button("➖", key=f"remove_{idx}"):
+            continue  # Skip this row if removed
     new_keywords.append({"keyword": kw, "volume": vol})
 
-# Add Row button (inline SVG)
-st.markdown("""
-    <div style="margin-top: 1rem;">
-        <form action="" method="post">
-            <button type="submit" name="add_kw_row" style="background: #2C2B3C; border: 1px solid #537DFC; padding: 6px 12px; border-radius: 8px; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <span style="display: inline-block; vertical-align: middle;">+</span>
-                <span>Add Row</span>
-            </button>
-        </form>
-    </div>
-""", unsafe_allow_html=True)
-
-if st.session_state.get("add_kw_row"):
+if st.button("➕ Add Row", key="add_kw_row"):
     new_keywords.append({"keyword": "", "volume": ""})
 
 # Update session state
 st.session_state.keywords_list = new_keywords
+
+# Final keyword formatting
+formatted_keywords = ", ".join(
+    f"{item['keyword']} ({item['volume']})"
+    for item in new_keywords
+    if item['keyword'].strip() and item['volume'].strip()
+)
 
 # Agency / Client fields just above the URL field
 col0a, col0b = st.columns([1, 1])
