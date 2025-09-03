@@ -681,6 +681,8 @@ with st.sidebar:
 
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
+st.divider()
+    
 # Optional: Version display at the bottom of the sidebar
     try:
         with open("VERSION.txt", "r") as f:
