@@ -685,10 +685,43 @@ st.subheader("Page Details")
 
 # Keyword Insertion Tool (in main section, below header)
 st.markdown("#### Optional Keywords")
-st.caption("Add up to 10 keywords and their search volumes. These will replace [KEYWORDS] in your template.")
+st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
+
+if "num_keywords" not in st.session_state:
+    st.session_state.num_keywords = 1
+
+col_add, col_remove = st.columns([1, 1])
+
+with col_add:
+    if st.markdown(
+        """
+        <button type="button" style="background-color:#323640; color:#E0E0E0; border:1px solid #4A90E2; border-radius:8px; padding:6px 10px; font-size:16px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+              <path d="M8 1a1 1 0 0 1 1 1v5h5a1 1 0 0 1 0 2H9v5a1 1 0 0 1-2 0V9H2a1 1 0 0 1 0-2h5V2a1 1 0 0 1 1-1z"/>
+            </svg>
+            Add Keyword
+        </button>
+        """,
+        unsafe_allow_html=True,
+    ):
+        st.session_state.num_keywords += 1
+
+with col_remove:
+    if st.session_state.num_keywords > 1 and st.markdown(
+        """
+        <button type="button" style="background-color:#323640; color:#E0E0E0; border:1px solid #4A90E2; border-radius:8px; padding:6px 10px; font-size:16px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+              <path d="M2 8a1 1 0 0 1 1-1h10a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1z"/>
+            </svg>
+            Remove Row
+        </button>
+        """,
+        unsafe_allow_html=True,
+    ):
+        st.session_state.num_keywords -= 1
 
 keywords = []
-for i in range(10):
+for i in range(st.session_state.num_keywords):
     col_k, col_v = st.columns([2, 1])
     with col_k:
         kw = st.text_input(f"Keyword {i+1}", key=f"kw_{i}")
