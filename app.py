@@ -683,6 +683,22 @@ with st.sidebar:
 # --- Single URL pane ---
 st.subheader("Page Details")
 
+# Keyword Insertion Tool (in main section, below header)
+st.markdown("#### Optional Keywords")
+st.caption("Add up to 10 keywords and their search volumes. These will replace [KEYWORDS] in your template.")
+
+keywords = []
+for i in range(10):
+    col_k, col_v = st.columns([2, 1])
+    with col_k:
+        kw = st.text_input(f"Keyword {i+1}", key=f"kw_{i}")
+    with col_v:
+        vol = st.text_input("Vol", key=f"vol_{i}")
+    if kw.strip() and vol.strip():
+        keywords.append(f"{kw.strip()} ({vol.strip()})")
+
+formatted_keywords = ", ".join(keywords)
+
 # Agency / Client fields just above the URL field
 col0a, col0b = st.columns([1, 1])
 with col0a:
@@ -712,6 +728,7 @@ if do_preview or do_doc:
             )
             meta["agency"] = agency_name.strip()
             meta["client_name"] = client_name.strip()
+            meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
 
             st.success("Extracted successfully.")
             with st.expander("Meta (preview)", expanded=True):
@@ -738,29 +755,4 @@ if st.session_state.single_docx:
         file_name=st.session_state.single_docx_name,
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         key="dl_single_docx",
-    )
-# --- VERSION FOOTER ---
-def uk_today_str() -> str:
-    tz = pytz.timezone("Europe/London")
-    return datetime.datetime.now(tz).strftime(DATE_FMT)
-    
-def get_version_info() -> str:
-    try:
-        with open("VERSION.txt", "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return "unknown version"
-
-with st.sidebar:
-    st.markdown("---")
-    st.caption(f"Version: `{get_version_info()}`")
-    st.markdown(
-        """
-        <a href="mailto:jack.alderton@crafted.co.uk" style="text-decoration:none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#E0E0E0" viewBox="0 0 16 16">
-              <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217l-8 4.8-8-4.8V4zm0 1.383v6.634L5.803 8.5 0 5.383zM6.761 9.193 0 13.017V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-.983l-6.761-3.824L8 10.383l-1.239-.69zM16 5.383 10.197 8.5 16 12.017V5.383z"/>
-            </svg>
-        </a>
-        """,
-        unsafe_allow_html=True
     )
