@@ -693,31 +693,11 @@ if "num_keywords" not in st.session_state:
 col_add, col_remove = st.columns([1, 1])
 
 with col_add:
-    if st.markdown(
-        """
-        <button type="button" style="background-color:#323640; color:#E0E0E0; border:1px solid #4A90E2; border-radius:8px; padding:6px 10px; font-size:16px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
-              <path d="M8 1a1 1 0 0 1 1 1v5h5a1 1 0 0 1 0 2H9v5a1 1 0 0 1-2 0V9H2a1 1 0 0 1 0-2h5V2a1 1 0 0 1 1-1z"/>
-            </svg>
-            Add Keyword
-        </button>
-        """,
-        unsafe_allow_html=True,
-    ):
+    if st.button("Add Row  \n<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='#E0E0E0' viewBox='0 0 16 16'><path d='M8 1a1 1 0 0 1 1 1v5h5a1 1 0 0 1 0 2H9v5a1 1 0 0 1-2 0V9H2a1 1 0 0 1 0-2h5V2a1 1 0 0 1 1-1z'/></svg>", key="add_kw", help="Add a keyword row"):
         st.session_state.num_keywords += 1
 
 with col_remove:
-    if st.session_state.num_keywords > 1 and st.markdown(
-        """
-        <button type="button" style="background-color:#323640; color:#E0E0E0; border:1px solid #4A90E2; border-radius:8px; padding:6px 10px; font-size:16px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
-              <path d="M2 8a1 1 0 0 1 1-1h10a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1z"/>
-            </svg>
-            Remove Row
-        </button>
-        """,
-        unsafe_allow_html=True,
-    ):
+    if st.session_state.num_keywords > 1 and st.button("Remove Row  \n<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='#E0E0E0' viewBox='0 0 16 16'><path d='M2 8a1 1 0 0 1 1-1h10a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1z'/></svg>", key="remove_kw", help="Remove last keyword row"):
         st.session_state.num_keywords -= 1
 
 keywords = []
