@@ -774,17 +774,17 @@ if do_preview or do_doc:
                 schema_preview = "\n".join(meta.get("schema_lines", [])) or "No JSON-LD schema found."
                 st.text(schema_preview)
 
-            if do_doc:
-                out_bytes = build_docx(tpl_file.read(), meta, lines)
+        if do_doc:
+            out_bytes = build_docx(tpl_file.read(), meta, lines)
 
-                raw_title = meta.get("page", "Untitled Page")
-                cleaned_title = safe_filename(raw_title)
-                fname = f"{cleaned_title} - Content Recommendations.docx"
+            raw_title = meta.get("page", "Untitled Page")
+            cleaned_title = safe_filename(raw_title)
+            fname = f"{cleaned_title} - Content Recommendations.docx"
 
-                st.session_state.single_docx = out_bytes
-                st.session_state.single_docx_name = fname
-            except Exception as e:
-                st.exception(e)
+            st.session_state.single_docx = out_bytes
+            st.session_state.single_docx_name = fname
+        except Exception as e:
+             st.exception(e)
 
 
 # render download button if we have a generated file
