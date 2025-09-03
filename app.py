@@ -694,17 +694,17 @@ keywords = st.session_state.keywords_list
 new_keywords = []
 
 for idx, pair in enumerate(keywords):
-    col1, col2, col3 = st.columns([3, 1.2, 0.4])
+    col1, col2, col3 = st.columns([4, 1, 0.5])
     with col1:
-        kw = st.text_input(f"Keyword {idx+1}", value=pair["keyword"], key=f"kw_{idx}")
+        kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
     with col2:
-        vol = st.text_input("Vol", value=pair["volume"], key=f"vol_{idx}")
+        vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
     with col3:
-        if st.button("➖", key=f"remove_{idx}"):
+        if st.button("-", key=f"remove_{idx}"):
             continue  # Skip this row if removed
     new_keywords.append({"keyword": kw, "volume": vol})
 
-if st.button("➕ Add Row", key="add_kw_row"):
+if st.button("+", key="add_kw_row"):
     new_keywords.append({"keyword": "", "volume": ""})
 
 # Update session state
