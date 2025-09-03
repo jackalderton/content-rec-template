@@ -680,39 +680,37 @@ with st.sidebar:
 
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
-# --- Keyword Insertion Tool ---
-st.markdown("#### Optional Keywords")
-st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
+with st.expander("Optional Keywords", expanded=False):
+    st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
-# Step 1: Get desired row count
-default_row_count = len(st.session_state.get("keywords_list", [])) or 1
-row_count = st.number_input("How many keyword rows?", min_value=1, max_value=100, step=1, value=default_row_count)
+    # --- Keyword Row Count ---
+    default_row_count = len(st.session_state.get("keywords_list", [])) or 1
+    row_count = st.number_input("How many keyword rows?", min_value=1, max_value=100, step=1, value=default_row_count)
 
-# Step 2: Update session state with correct number of rows
-existing = st.session_state.get("keywords_list", [])
-while len(existing) < row_count:
-    existing.append({"keyword": "", "volume": ""})
-if len(existing) > row_count:
-    existing = existing[:row_count]
-st.session_state.keywords_list = existing
+    # --- Initialise or Trim keywords_list ---
+    existing = st.session_state.get("keywords_list", [])
+    while len(existing) < row_count:
+        existing.append({"keyword": "", "volume": ""})
+    if len(existing) > row_count:
+        existing = existing[:row_count]
+    st.session_state.keywords_list = existing
 
-# Step 3: Render input fields
-new_keywords = []
-for idx, pair in enumerate(st.session_state.keywords_list):
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
-    with col2:
-        vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
-    new_keywords.append({"keyword": kw, "volume": vol})
+    # --- Render input fields ---
+    new_keywords = []
+    for idx, pair in enumerate(st.session_state.keywords_list):
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
+        with col2:
+            vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
+        new_keywords.append({"keyword": kw, "volume": vol})
 
-# Step 4: Update final list
-st.session_state.keywords_list = new_keywords
+    st.session_state.keywords_list = new_keywords
 
-# Step 5: Format for template
+# --- Format for template ---
 formatted_keywords = ", ".join(
     f"{item['keyword']} ({item['volume']})"
-    for item in new_keywords
+    for item in st.session_state.keywords_list
     if item['keyword'].strip() and item['volume'].strip()
 )
 
