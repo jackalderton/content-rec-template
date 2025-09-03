@@ -1,6 +1,7 @@
 import io
 import re
 import json
+import html
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -68,6 +69,12 @@ NOISE_SUBSTRINGS = (
     "place this code immediately before the closing",
 )
 
+def safe_filename(name: str, maxlen: int = 120) -> str:
+    name = html.unescape(name)
+    name = re.sub(r"[\\/*?\"<>|:£#@!^&+=()\[\]{}]", "", name)  # strip dangerous characters
+    name = re.sub(r"\s+", " ", name)
+    name = name.replace(",", "").strip()
+    return (name[:maxlen] or "document").rstrip(". ")
 # =========================================================
 # UTILS
 # =========================================================
@@ -769,11 +776,14 @@ if do_preview or do_doc:
 
             if do_doc:
                 out_bytes = build_docx(tpl_file.read(), meta, lines)
-                fname = safe_filename(f"{meta['page']} - Content Recommendations") + ".docx"
+
+                raw_title = meta.get("page", "Untitled Page")
+                cleaned_title = safe_filename(raw_title)
+                fname = f"{cleaned_title} - Content Recommendations.docx"
+
                 st.session_state.single_docx = out_bytes
                 st.session_state.single_docx_name = fname
-        except Exception as e:
-            st.exception(e)
+
 
 # render download button if we have a generated file
 if st.session_state.single_docx:
