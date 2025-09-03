@@ -690,11 +690,6 @@ if "keywords_list" not in st.session_state:
 st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
 
 
-# Add row button FIRST (to trigger before rendering inputs)
-if st.button("➕ Add Row", key="add_kw_row"):
-st.session_state.keywords_list.append({"keyword": "", "volume": ""})
-
-
 # Work from current session state
 keywords = st.session_state.keywords_list
 new_keywords = []
@@ -702,7 +697,7 @@ new_keywords = []
 
 # Render keyword rows
 for idx, pair in enumerate(keywords):
-col1, col2, col3 = st.columns([4, 1, 0.5])
+col1, col2, col3 = st.columns([4, 1.5, 0.5])
 with col1:
 kw = st.text_input("", value=pair["keyword"], key=f"kw_{idx}", placeholder="Keyword")
 with col2:
@@ -712,6 +707,13 @@ st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
 if st.button("➖", key=f"remove_{idx}"):
 continue # Skip this row if removed
 new_keywords.append({"keyword": kw, "volume": vol})
+
+
+# Add row button LAST for layout consistency
+st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
+if st.button("➕ Add Keyword Row", key="add_kw_row"):
+new_keywords.append({"keyword": "", "volume": ""})
+st.markdown("</div>", unsafe_allow_html=True)
 
 
 # Update session state
