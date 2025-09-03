@@ -680,12 +680,12 @@ with st.sidebar:
 
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
-with st.expander("Optional Keywords", expanded=False):
-    st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
+with st.expander("Add Keywords (BETA)", expanded=False):
+    st.caption("Add keywords and search volumes. This isn't 100% reliable so please use with caution!")
 
     # --- Keyword Row Count ---
     default_row_count = len(st.session_state.get("keywords_list", [])) or 1
-    row_count = st.number_input("How many keyword rows?", min_value=1, max_value=100, step=1, value=default_row_count)
+    row_count = st.number_input("How many keywords do you need to add? (Max 10)", min_value=1, max_value=10, step=1, value=default_row_count)
 
     # --- Initialise or Trim keywords_list ---
     existing = st.session_state.get("keywords_list", [])
