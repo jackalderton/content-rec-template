@@ -683,34 +683,43 @@ with st.sidebar:
 # --- Single URL pane ---
 st.subheader("Page Details")
 
-# Keyword Insertion Tool (in main section, below header)
+# --- Keyword Insertion Tool ---
 st.markdown("#### Optional Keywords")
 st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in your template.")
 
-if "num_keywords" not in st.session_state:
-    st.session_state.num_keywords = 1
+# Init state
+if "keywords_list" not in st.session_state:
+    st.session_state.keywords_list = [{"keyword": "", "volume": ""}]
 
-col_add, col_remove = st.columns([1, 1])
+keywords = st.session_state.keywords_list
+new_keywords = []
 
-with col_add:
-    if st.button("➕ Add Row", key="add_kw"):
-        st.session_state.num_keywords += 1
+for idx, pair in enumerate(keywords):
+    col1, col2, col3 = st.columns([2, 1, 0.3])
+    with col1:
+        kw = st.text_input(f"Keyword {idx+1}", value=pair["keyword"], key=f"kw_{idx}")
+    with col2:
+        vol = st.text_input("Vol", value=pair["volume"], key=f"vol_{idx}")
+    with col3:
+        if st.button("➖", key=f"remove_{idx}"):
+            continue  # Skip this row (i.e., remove it)
+    
+    # Keep updated values
+    new_keywords.append({"keyword": kw, "volume": vol})
 
-with col_remove:
-    if st.session_state.num_keywords > 1 and st.button("➖ Remove Row", key="remove_kw"):
-        st.session_state.num_keywords -= 1
+# Add Row button (inline or below)
+if st.button("➕ Add Row", key="add_kw_row"):
+    new_keywords.append({"keyword": "", "volume": ""})
 
-keywords = []
-for i in range(st.session_state.num_keywords):
-    col_k, col_v = st.columns([2, 1])
-    with col_k:
-        kw = st.text_input(f"Keyword {i+1}", key=f"kw_{i}")
-    with col_v:
-        vol = st.text_input("Vol", key=f"vol_{i}")
-    if kw.strip() and vol.strip():
-        keywords.append(f"{kw.strip()} ({vol.strip()})")
+# Update session state
+st.session_state.keywords_list = new_keywords
 
-formatted_keywords = ", ".join(keywords)
+# Format for [KEYWORDS]
+formatted_keywords = ", ".join(
+    f"{item['keyword']} ({item['volume']})"
+    for item in st.session_state.keywords_list
+    if item["keyword"].strip() and item["volume"].strip()
+)
 
 # Agency / Client fields just above the URL field
 col0a, col0b = st.columns([1, 1])
