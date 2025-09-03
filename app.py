@@ -690,14 +690,14 @@ st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in yo
 if "num_keywords" not in st.session_state:
     st.session_state.num_keywords = 1
 
-col_add, col_remove = st.columns([1, 1])
+ccol_add, col_remove = st.columns([1, 1])
 
 with col_add:
-    if st.button("Add Row  \n<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='#E0E0E0' viewBox='0 0 16 16'><path d='M8 1a1 1 0 0 1 1 1v5h5a1 1 0 0 1 0 2H9v5a1 1 0 0 1-2 0V9H2a1 1 0 0 1 0-2h5V2a1 1 0 0 1 1-1z'/></svg>", key="add_kw", help="Add a keyword row"):
+    if st.button("➕ Add Row", key="add_kw"):
         st.session_state.num_keywords += 1
 
 with col_remove:
-    if st.session_state.num_keywords > 1 and st.button("Remove Row  \n<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='#E0E0E0' viewBox='0 0 16 16'><path d='M2 8a1 1 0 0 1 1-1h10a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1z'/></svg>", key="remove_kw", help="Remove last keyword row"):
+    if st.session_state.num_keywords > 1 and st.button("➖ Remove Row", key="remove_kw"):
         st.session_state.num_keywords -= 1
 
 keywords = []
