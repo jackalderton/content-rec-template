@@ -690,7 +690,7 @@ st.caption("Add keywords and search volumes. These will replace [KEYWORDS] in yo
 if "num_keywords" not in st.session_state:
     st.session_state.num_keywords = 1
 
-ccol_add, col_remove = st.columns([1, 1])
+col_add, col_remove = st.columns([1, 1])
 
 with col_add:
     if st.button("➕ Add Row", key="add_kw"):
