@@ -681,7 +681,7 @@ with st.sidebar:
 
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
-st.divider()
+    st.divider()
     
 # Optional: Version display at the bottom of the sidebar
     try:
