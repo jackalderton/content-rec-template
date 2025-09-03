@@ -700,11 +700,11 @@ for idx, pair in enumerate(keywords):
     with col2:
         vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
     with col3:
-        if st.button("-", key=f"remove_{idx}"):
+        if st.button("➖", key=f"remove_{idx}"):
             continue  # Skip this row if removed
     new_keywords.append({"keyword": kw, "volume": vol})
 
-if st.button("+", key="add_kw_row"):
+if st.button("➕", key="add_kw_row"):
     new_keywords.append({"keyword": "", "volume": ""})
 
 # Update session state
