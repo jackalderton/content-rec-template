@@ -701,14 +701,14 @@ for idx, pair in enumerate(keywords):
         vol = st.text_input("", value=pair["volume"], key=f"vol_{idx}", placeholder="Vol")
     with col3:
         st.markdown("<div style='height: 1.9em'></div>", unsafe_allow_html=True)
-        if st.button("➖", key=f"remove_{idx}"):
+        if st.button("-", key=f"remove_{idx}"):
             continue  # Skip this row if removed
     new_keywords.append({"keyword": kw, "volume": vol})
 
 # Render add row button separately for alignment
 col_add = st.columns([5])[0]
 with col_add:
-    if st.button("➕ Add Keyword Row", key="add_kw_row"):
+    if st.button("+ Add Keyword Row", key="add_kw_row"):
         new_keywords.append({"keyword": "", "volume": ""})
 
 # Update session state
