@@ -649,6 +649,11 @@ if "single_docx" not in st.session_state:
     st.session_state.single_docx_name = None
 
 with st.sidebar:
+    if st.button("🔁 Reset Tool"):
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.experimental_rerun()
+    st.divider()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
     st.caption("This should be your blank template with placeholders (e.g., [PAGE], [DATE], [PAGE BODY CONTENT], [SCHEMA], etc.).")
