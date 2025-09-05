@@ -701,7 +701,7 @@ with st.sidebar:
 
 
 with st.expander("Add Keywords (BETA)", expanded=False):
-    st.caption("Add keywords and search volumes. This isn't 100% reliable so please use with caution!")
+    st.caption("Add keywords and search volumes. The whole script needs to re-run each time you click the + or - buttons, so please be a bit gentle. You may need to click each button more than once, but please don't just hammer them like a lunatic.")
 
     # --- Keyword Row Count ---
     default_row_count = len(st.session_state.get("keywords_list", [])) or 1
