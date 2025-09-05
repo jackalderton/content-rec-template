@@ -651,7 +651,9 @@ if "single_docx" not in st.session_state:
 with st.sidebar:
     if st.sidebar.button("Reset"):
         st.markdown(
-            "<script>window.location.reload(true);</script>",
+            """
+            <meta http-equiv="refresh" content="0">
+            """,
             unsafe_allow_html=True,
         )
         st.rerun()
