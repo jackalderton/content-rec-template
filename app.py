@@ -753,7 +753,7 @@ if url.strip().lower() == "goatmodeactivated":
     goat_image_path = ASSETS_DIR / "goatmode.png"
     if goat_image_path.exists():
         st.markdown("## 🐐 GOAT MODE ACTIVATED 🐐")
-        st.image(str(goat_image_path), caption="The GOAT has arrived.", use_column_width=True)
+        st.image(str(goat_image_path), caption="The GOAT has arrived.", use_container_width=True)
     else:
         st.warning("Goat image not found in /assets. Please add goatmode.png.")
     
