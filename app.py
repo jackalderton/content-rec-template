@@ -649,7 +649,8 @@ if "single_docx" not in st.session_state:
     st.session_state.single_docx_name = None
 
 with st.sidebar:
-    if st.button("Reset"):
+    if st.button("🔁 Reset Tool"):
+        st.session_state.clear()  # Clear all session state keys
         st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
