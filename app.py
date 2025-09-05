@@ -656,7 +656,6 @@ with st.sidebar:
             """,
             unsafe_allow_html=True,
         )
-        st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
     st.caption("This should be your blank template with placeholders (e.g., [PAGE], [DATE], [PAGE BODY CONTENT], [SCHEMA], etc.).")
