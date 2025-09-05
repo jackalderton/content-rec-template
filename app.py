@@ -649,12 +649,10 @@ if "single_docx" not in st.session_state:
     st.session_state.single_docx_name = None
 
 with st.sidebar:
-    if st.sidebar.button("🔁 Reset Tool"):
-        st.markdown(
-            """
-            <meta http-equiv="refresh" content="0">
-            """,
-            unsafe_allow_html=True,
+    if st.sidebar.button("Reset"):
+    st.markdown(
+        "<script>window.location.reload(true);</script>",
+        unsafe_allow_html=True,
     )
         st.rerun()
     st.header("Template & Options")
