@@ -650,10 +650,10 @@ if "single_docx" not in st.session_state:
 
 with st.sidebar:
     if st.sidebar.button("Reset"):
-    st.markdown(
-        "<script>window.location.reload(true);</script>",
-        unsafe_allow_html=True,
-    )
+        st.markdown(
+            "<script>window.location.reload(true);</script>",
+            unsafe_allow_html=True,
+        )
         st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
