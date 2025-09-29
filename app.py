@@ -4,17 +4,22 @@ import secrets
 
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
-# --- Check for token in URL (helps survive refreshes) ---
+# --- Get token from URL (helps survive refreshes) ---
 query_params = st.experimental_get_query_params()
 url_token = query_params.get("token", [None])[0]
 
-# Initialise session state
+# --- Clear invalid/stale tokens ---
+if url_token and url_token != st.session_state.get("session_token"):
+    st.experimental_set_query_params()
+    url_token = None
+
+# --- Initialise session state ---
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 if "session_token" not in st.session_state:
     st.session_state["session_token"] = None
 
-# If token in URL matches session token → keep logged in
+# --- If token in URL matches session token → keep logged in ---
 if url_token and url_token == st.session_state["session_token"]:
     st.session_state["authenticated"] = True
 
@@ -22,6 +27,7 @@ if url_token and url_token == st.session_state["session_token"]:
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
 
+    # Wrap input + button in a form so Enter works
     with st.form("login_form", clear_on_submit=False):
         pwd = st.text_input("Enter password", type="password")
         submitted = st.form_submit_button("Login")
