@@ -20,15 +20,15 @@ if "authenticated" not in st.session_state:
 if "session_token" not in st.session_state:
     st.session_state["session_token"] = None
 
-# --- If token in URL matches session token → keep logged in ---
+# --- If URL has a token but session is empty, restore it ---
+if url_token and not st.session_state["session_token"]:
+    st.session_state["session_token"] = url_token
+    st.session_state["authenticated"] = True
+
+# --- If URL token matches session token, keep logged in ---
 if url_token and url_token == st.session_state["session_token"]:
     st.session_state["authenticated"] = True
 
-# --- Ensure token persists in URL across refreshes ---
-if st.session_state.get("authenticated") and st.session_state.get("session_token"):
-    if st.query_params.get("token") != st.session_state["session_token"]:
-        st.query_params["token"] = st.session_state["session_token"]
-        
 # --- Login screen ---
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
