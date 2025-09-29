@@ -22,6 +22,11 @@ if "session_token" not in st.session_state:
 if url_token and url_token == st.session_state["session_token"]:
     st.session_state["authenticated"] = True
 
+# --- Ensure token persists in URL across refreshes ---
+if st.session_state.get("authenticated") and st.session_state.get("session_token"):
+    if st.query_params.get("token") != st.session_state["session_token"]:
+        st.query_params["token"] = st.session_state["session_token"]
+        
 # --- Login screen ---
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
