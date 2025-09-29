@@ -10,7 +10,7 @@ if "authenticated" not in st.session_state:
 
 # If not logged in, show password prompt
 if not st.session_state["authenticated"]:
-    st.title("🔒 Login Required")
+    st.title("🔒 Password Please!")
     pwd = st.text_input("Enter password", type="password")
 
     if st.button("Login"):
