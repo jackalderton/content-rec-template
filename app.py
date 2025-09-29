@@ -444,11 +444,17 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
     })
     # Main content
     replace_placeholder_with_lines(doc, "[PAGE BODY CONTENT]", lines)
-    # Schema (optional placeholder)
+    # Schema section
+if meta.get("schema_lines"):
     try:
-        replace_placeholder_with_lines(doc, "[SCHEMA]", meta.get("schema_lines", []))
+        replace_placeholder_with_lines(doc, "[SCHEMA]", meta["schema_lines"])
     except ValueError:
         pass
+else:
+    # Remove Schema heading + placeholder if toggle is off
+    for p in iter_paragraphs_and_tables(doc):
+        if "Schema" in (p.text or "") or "[SCHEMA]" in (p.text or ""):
+            p.clear()
 
     out = io.BytesIO()
     doc.save(out)
@@ -687,11 +693,13 @@ with st.sidebar:
 
     st.divider()
     st.header("Extra Settings")
+    include_schema = st.toggle("Include Schema", value=False)
+    
     annotate_links = st.toggle("Append (→ URL) after anchor text", value=False)
 
     remove_before_h1 = st.toggle("Delete everything before first <h1>", value=False)
 
-    include_img_src = st.toggle("Include <img> src in output", value=False)
+    include_img_src = st.toggle("Include image sources in output", value=False)
 
     st.caption("Timezone fixed to Europe/London; dates in DD/MM/YYYY.")
 
@@ -798,18 +806,23 @@ if do_preview or do_doc:
     if not tpl_file and do_doc:
         st.error("Aaaaaah!!! Something went wrong! Panic! - oh wait, it's fine - you just forgot to upload the template file. Read the stuff on the left if you're stuck :)")
     else:
-        try:
-            meta, lines = process_url(
-                url,
-                exclude_selectors,
-                annotate_links=annotate_links,
-                remove_before_h1=remove_before_h1,
-                include_img_src=include_img_src,
-            )
-            meta["agency"] = agency_name.strip()
-            meta["client_name"] = client_name.strip()
-            meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
+    try:
+        meta, lines = process_url(
+            url,
+            exclude_selectors,
+            annotate_links=annotate_links,
+            remove_before_h1=remove_before_h1,
+            include_img_src=include_img_src,
+        )
 
+        meta["agency"] = agency_name.strip()
+        meta["client_name"] = client_name.strip()
+        meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
+
+        if not include_schema:
+            meta["schema_lines"] = []
+
+            
             st.success("Extracted successfully.")
             with st.expander("Meta (preview)", expanded=True):
                 st.write(meta)
