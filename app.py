@@ -1,18 +1,9 @@
 import os
 import secrets
-from pathlib import Path
-
 import streamlit as st
+from urllib.parse import urlencode
 
 APP_PASSWORD = os.getenv("APP_PASSWORD")
-
-# --- Get token from URL (helps survive refreshes) ---
-url_token = st.query_params.get("token", None)
-
-# --- Clear invalid/stale tokens ---
-if url_token and url_token != st.session_state.get("session_token"):
-    st.query_params.clear()
-    url_token = None
 
 # --- Initialise session state ---
 if "authenticated" not in st.session_state:
@@ -20,46 +11,49 @@ if "authenticated" not in st.session_state:
 if "session_token" not in st.session_state:
     st.session_state["session_token"] = None
 
+# --- Get token from URL ---
+url_token = st.query_params.get("token", None)
+
 # --- If URL has a token but session is empty, restore it ---
 if url_token and not st.session_state["session_token"]:
     st.session_state["session_token"] = url_token
     st.session_state["authenticated"] = True
 
 # --- If URL token matches session token, keep logged in ---
-if url_token and url_token == st.session_state["session_token"]:
+elif url_token and url_token == st.session_state["session_token"]:
     st.session_state["authenticated"] = True
 
-# --- Ensure token persists in URL across refreshes ---
+# --- Ensure token persists in URL (Streamlit reruns) ---
 if st.session_state.get("authenticated") and st.session_state.get("session_token"):
-    if st.query_params.get("token") != st.session_state["session_token"]:
-        st.query_params["token"] = st.session_state["session_token"]
+    st.query_params["token"] = st.session_state["session_token"]
+
+    # --- Sticky URL in browser (prevents Cloud Run from wiping query params) ---
+    qs = urlencode({"token": st.session_state["session_token"]})
+    st.markdown(
+        f"<script>window.history.replaceState(null, '', '?{qs}');</script>",
+        unsafe_allow_html=True
+    )
 
 # --- Login screen ---
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
 
-    # Wrap input + button in a form so Enter works
     with st.form("login_form", clear_on_submit=False):
         pwd = st.text_input("Enter password", type="password")
         submitted = st.form_submit_button("Login")
 
     if submitted:
         if pwd == APP_PASSWORD:
-            # Generate a random session token
             token = secrets.token_hex(16)
             st.session_state["authenticated"] = True
             st.session_state["session_token"] = token
-
-            # Put token in URL so it survives refresh
             st.query_params["token"] = token
-
             st.success("Access granted ✅")
             st.rerun()
         else:
             st.error("Incorrect password ❌")
 
     st.stop()
-
 import io
 import re
 import json
