@@ -807,23 +807,22 @@ if do_preview or do_doc:
     if not tpl_file and do_doc:
         st.error("Aaaaaah!!! Something went wrong! Panic! - oh wait, it's fine - you just forgot to upload the template file. Read the stuff on the left if you're stuck :)")
     else:
-    try:
-        meta, lines = process_url(
-            url,
-            exclude_selectors,
-            annotate_links=annotate_links,
-            remove_before_h1=remove_before_h1,
-            include_img_src=include_img_src,
-        )
+        try:
+            meta, lines = process_url(
+                url,
+                exclude_selectors,
+                annotate_links=annotate_links,
+                remove_before_h1=remove_before_h1,
+                include_img_src=include_img_src,
+            )
 
-        meta["agency"] = agency_name.strip()
-        meta["client_name"] = client_name.strip()
-        meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
+            meta["agency"] = agency_name.strip()
+            meta["client_name"] = client_name.strip()
+            meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
 
-        if not include_schema:
-            meta["schema_lines"] = []
+            if not include_schema:
+                meta["schema_lines"] = []
 
-            
             st.success("Extracted successfully.")
             with st.expander("Meta (preview)", expanded=True):
                 st.write(meta)
@@ -842,9 +841,9 @@ if do_preview or do_doc:
 
                 st.session_state.single_docx = out_bytes
                 st.session_state.single_docx_name = fname
-                
+
         except Exception as e:
-             st.exception(e)
+            st.exception(e)
 
 
 # render download button if we have a generated file
