@@ -14,7 +14,7 @@ if not st.session_state["authenticated"]:
         if pwd == APP_PASSWORD:
             st.session_state["authenticated"] = True
             st.success("Access granted ✅")
-            st.experimental_rerun()   # 🔑 refresh the app so main UI loads
+            st.rerun()   # 🔑 refresh the app so main UI loads
         else:
             st.error("Incorrect password ❌")
 
