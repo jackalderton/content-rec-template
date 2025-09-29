@@ -59,10 +59,8 @@ import json
 import html
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
-from pathlib import Path
 import datetime
 import pytz
-import streamlit as st
 import requests
 from bs4 import BeautifulSoup, Tag, NavigableString, Comment, Doctype, ProcessingInstruction
 from docx import Document
@@ -620,7 +618,6 @@ def safe_filename(name: str, maxlen: int = 120) -> str:
 # STYLES — Local Circular + colours + background
 # =========================================================
 from base64 import b64encode
-from pathlib import Path
 
 APP_DIR = Path(__file__).resolve().parent
 CANDIDATES = {
@@ -839,8 +836,6 @@ with col0b:
     agency_name = st.text_input("Agency/Practitioner Name", value="", placeholder="e.g., Crafted")
 
 url = st.text_input("URL", value="", placeholder="e.g., https://www.example.com")
-from pathlib import Path
-import streamlit as st
 
 APP_DIR = Path(__file__).parent
 ASSETS_DIR = APP_DIR / "assets"
