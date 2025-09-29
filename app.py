@@ -1,20 +1,43 @@
 import os
 import streamlit as st
+import secrets
 
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
+# --- Check for token in URL (helps survive refreshes) ---
+query_params = st.experimental_get_query_params()
+url_token = query_params.get("token", [None])[0]
+
+# Initialise session state
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
+if "session_token" not in st.session_state:
+    st.session_state["session_token"] = None
 
+# If token in URL matches session token → keep logged in
+if url_token and url_token == st.session_state["session_token"]:
+    st.session_state["authenticated"] = True
+
+# --- Login screen ---
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
-    pwd = st.text_input("Enter password", type="password")
 
-    if st.button("Login"):
+    with st.form("login_form", clear_on_submit=False):
+        pwd = st.text_input("Enter password", type="password")
+        submitted = st.form_submit_button("Login")
+
+    if submitted:
         if pwd == APP_PASSWORD:
+            # Generate a random session token
+            token = secrets.token_hex(16)
             st.session_state["authenticated"] = True
+            st.session_state["session_token"] = token
+
+            # Put token in URL so it survives refresh
+            st.experimental_set_query_params(token=token)
+
             st.success("Access granted ✅")
-            st.rerun()   # 🔑 refresh the app so main UI loads
+            st.rerun()
         else:
             st.error("Incorrect password ❌")
 
@@ -681,13 +704,12 @@ if "single_docx" not in st.session_state:
     st.session_state.single_docx_name = None
 
 with st.sidebar:
-    if st.sidebar.button("Reset"):
-        st.markdown(
-            """
-            <meta http-equiv="refresh" content="0">
-            """,
-            unsafe_allow_html=True,
-        )
+    if st.session_state.get("authenticated"):
+        if st.button("Logout"):
+            st.session_state["authenticated"] = False
+            st.session_state["session_token"] = None
+            st.experimental_set_query_params()  # clears token from URL
+            st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
     st.caption("This should be your blank template with placeholders (e.g., [PAGE], [DATE], [PAGE BODY CONTENT], [SCHEMA], etc.).")
