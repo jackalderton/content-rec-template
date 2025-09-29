@@ -7,7 +7,7 @@ if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
 if not st.session_state["authenticated"]:
-    st.title("🔒 Please Enter Password")
+    st.title("🔒 Password Please!")
     pwd = st.text_input("Enter password", type="password")
 
     if st.button("Login"):
