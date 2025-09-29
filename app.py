@@ -693,6 +693,7 @@ with st.sidebar:
 
     st.divider()
     st.header("Extra Settings")
+    
     include_schema = st.toggle("Include Schema", value=False)
     
     annotate_links = st.toggle("Append (→ URL) after anchor text", value=False)
