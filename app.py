@@ -5,12 +5,11 @@ import secrets
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
 # --- Get token from URL (helps survive refreshes) ---
-query_params = st.query_params()
-url_token = query_params.get("token", [None])[0]
+url_token = st.query_params.get("token", None)
 
 # --- Clear invalid/stale tokens ---
 if url_token and url_token != st.session_state.get("session_token"):
-    st.experimental_set_query_params()
+    st.query_params.clear()
     url_token = None
 
 # --- Initialise session state ---
@@ -40,7 +39,7 @@ if not st.session_state["authenticated"]:
             st.session_state["session_token"] = token
 
             # Put token in URL so it survives refresh
-            st.experimental_set_query_params(token=token)
+            st.query_params["token"] = token
 
             st.success("Access granted ✅")
             st.rerun()
@@ -714,7 +713,7 @@ with st.sidebar:
         if st.button("Logout"):
             st.session_state["authenticated"] = False
             st.session_state["session_token"] = None
-            st.experimental_set_query_params()  # clears token from URL
+            st.query_params.clear()  # clears token from URL
             st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
