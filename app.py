@@ -429,6 +429,8 @@ def replace_placeholder_with_lines(doc: Document, placeholder: str, lines: list[
 def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
     bio = io.BytesIO(template_bytes)
     doc = Document(bio)
+
+    # Replace main placeholders
     replace_placeholders_safe(doc, {
         "[PAGE]": meta.get("page", ""),
         "[DATE]": meta.get("date", ""),
@@ -442,19 +444,21 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
         "[CLIENT NAME]": meta.get("client_name", ""),
         "[KEYWORDS]": meta.get("keywords", ""),
     })
+
     # Main content
     replace_placeholder_with_lines(doc, "[PAGE BODY CONTENT]", lines)
+
     # Schema section
-if meta.get("schema_lines"):
-    try:
-        replace_placeholder_with_lines(doc, "[SCHEMA]", meta["schema_lines"])
-    except ValueError:
-        pass
-else:
-    # Remove Schema heading + placeholder if toggle is off
-    for p in iter_paragraphs_and_tables(doc):
-        if "Schema" in (p.text or "") or "[SCHEMA]" in (p.text or ""):
-            p.clear()
+    if meta.get("schema_lines"):
+        try:
+            replace_placeholder_with_lines(doc, "[SCHEMA]", meta["schema_lines"])
+        except ValueError:
+            pass
+    else:
+        # Remove Schema heading + placeholder if toggle is off
+        for p in iter_paragraphs_and_tables(doc):
+            if "Schema" in (p.text or "") or "[SCHEMA]" in (p.text or ""):
+                p.clear()
 
     out = io.BytesIO()
     doc.save(out)
