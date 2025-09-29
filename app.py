@@ -734,11 +734,27 @@ with st.expander("Add Keywords (BETA)", expanded=False):
 
     st.session_state.keywords_list = new_keywords
 
+# --- Sort keywords by search volume (highest → lowest) ---
+def parse_volume(vol_str: str) -> int:
+    try:
+        # Allow numbers with commas (e.g. "12,300")
+        return int(vol_str.replace(",", "").strip())
+    except Exception:
+        return 0
+
+sorted_keywords = sorted(
+    [
+        item for item in st.session_state.keywords_list
+        if item['keyword'].strip() and item['volume'].strip()
+    ],
+    key=lambda x: parse_volume(x['volume']),
+    reverse=True,
+)
+
 # --- Format for template ---
 formatted_keywords = ", ".join(
     f"{item['keyword']} ({item['volume']})"
-    for item in st.session_state.keywords_list
-    if item['keyword'].strip() and item['volume'].strip()
+    for item in sorted_keywords
 )
 
 # Agency / Client fields just above the URL field
