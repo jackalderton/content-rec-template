@@ -7,6 +7,20 @@ import streamlit as st
 
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
+# --- Page config (favicon + title applies everywhere, incl. login) ---
+APP_DIR = Path(__file__).resolve().parent
+ICON_CANDIDATES = [
+    APP_DIR / "assets" / "JAFavicon.png",
+    APP_DIR / "JAFavicon.png",
+    ]
+icon_path = next((p for p in ICON_CANDIDATES if p.exists()), None)
+
+st.set_page_config(
+    page_title="Recmatic - Generate Rec Templates Instantly",
+    page_icon=str(icon_path) if icon_path else "🧩",
+    layout="wide",
+)
+
 # --- Initialise session state ---
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
@@ -69,19 +83,6 @@ from bs4 import BeautifulSoup, Tag, NavigableString, Comment, Doctype, Processin
 from docx import Document
 from docx.text.paragraph import Paragraph
 from docx.oxml import OxmlElement
-
-# =========================================================
-# PAGE CONFIG — MUST be the first Streamlit call
-# =========================================================
-APP_DIR = Path(__file__).resolve().parent
-ICON_CANDIDATES = [APP_DIR / "assets" / "JAFavicon.png", APP_DIR / "JAFavicon.png"]
-icon_path = next((p for p in ICON_CANDIDATES if p.exists()), None)
-
-st.set_page_config(
-    page_title="Recmatic - Generate Rec Templates Instantly",
-    page_icon=str(icon_path) if icon_path else "🧩",
-    layout="wide",
-)
 
 # =========================================================
 # CONSTANTS / SETTINGS
