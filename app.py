@@ -735,10 +735,17 @@ with st.expander("Add Keywords (BETA)", expanded=False):
     st.session_state.keywords_list = new_keywords
 
 # --- Sort keywords by search volume (highest → lowest) ---
-def parse_volume(vol_str: str) -> int:
+def parse_volume(vol) -> int:
+    s = str(vol).strip().lower().replace(",", "")
+    mult = 1
+    if s.endswith("k"):  # e.g. 1.2k → 1200
+        mult = 1000
+        s = s[:-1]
+    elif s.endswith("m"):  # e.g. 2m → 2,000,000
+        mult = 1_000_000
+        s = s[:-1]
     try:
-        # Allow numbers with commas (e.g. "12,300")
-        return int(vol_str.replace(",", "").strip())
+        return int(float(s) * mult)
     except Exception:
         return 0
 
