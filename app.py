@@ -1,3 +1,27 @@
+import os
+import streamlit as st
+
+# Pull password from environment variable
+APP_PASSWORD = os.getenv("APP_PASSWORD")
+
+# Initialize session state for login
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+# If not logged in, show password prompt
+if not st.session_state["authenticated"]:
+    st.title("🔒 Login Required")
+    pwd = st.text_input("Enter password", type="password")
+
+    if st.button("Login"):
+        if pwd == APP_PASSWORD:
+            st.session_state["authenticated"] = True
+            st.success("Access granted ✅")
+        else:
+            st.error("Incorrect password ❌")
+
+    st.stop()  # Stop the app until user logs in
+
 import io
 import re
 import json
