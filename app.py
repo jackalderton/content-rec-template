@@ -5,7 +5,7 @@ import secrets
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
 # --- Get token from URL (helps survive refreshes) ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params()
 url_token = query_params.get("token", [None])[0]
 
 # --- Clear invalid/stale tokens ---
