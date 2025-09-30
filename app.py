@@ -738,7 +738,7 @@ with st.sidebar:
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             )
     else:
-        st.info("There's a dev issue here. Drop Jack a message and tell him that he's handsome, but also that he needs to upload the template to /assets/. Definitely lead with the whole 'handsome' thing though.")
+        st.info("Uh oh, we can't find the Word template. Please contact the dev team to get this reuploaded.")
     st.caption("Once downloaded, you'll still need to upload your template above.")
 
     st.divider()
