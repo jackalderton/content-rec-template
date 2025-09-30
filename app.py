@@ -843,16 +843,6 @@ url = st.text_input("URL", value="", placeholder="e.g., https://www.example.com"
 
 APP_DIR = Path(__file__).parent
 ASSETS_DIR = APP_DIR / "assets"
-
-# --- Easter Egg Trigger ---
-if url.strip().lower() == "goatmodeactivated":
-    goat_image_path = ASSETS_DIR / "goatmode.png"
-    if goat_image_path.exists():
-        st.markdown("## 🐐 GOAT MODE ACTIVATED 🐐")
-        st.image(str(goat_image_path), caption="The GOAT has arrived.", width=300)
-        st.balloons()
-    else:
-        st.warning("Goat image not found in /assets. Please add goatmode.png.")
     
 col_a, col_b = st.columns([1, 1])
 with col_a:
