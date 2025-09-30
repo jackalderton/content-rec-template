@@ -40,7 +40,7 @@ The app will start on [http://localhost:8501](http://localhost:8501).
 
 ---
 
-### ⚠️ Note on Local Development
+### Note on Local Development
 
 This app uses **Google Cloud Run Secret Manager** to store the login password.
 When running locally, the `APP_PASSWORD` environment variable will not be available unless you:
