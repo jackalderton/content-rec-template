@@ -7,7 +7,7 @@ import streamlit as st
 
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
-# --- Page config (favicon + title applies everywhere, incl. login) ---
+# config
 APP_DIR = Path(__file__).resolve().parent
 ICON_CANDIDATES = [
     APP_DIR / "assets" / "JAFavicon.png",
@@ -21,36 +21,31 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- Initialise session state ---
+# session authentication and tokens and stuff
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 if "session_token" not in st.session_state:
     st.session_state["session_token"] = None
 
-# --- Get token from URL ---
 url_token = st.query_params.get("token", None)
 
-# --- If URL has a token but session is empty, restore it ---
 if url_token and not st.session_state["session_token"]:
     st.session_state["session_token"] = url_token
     st.session_state["authenticated"] = True
 
-# --- If URL token matches session token, keep logged in ---
 elif url_token and url_token == st.session_state["session_token"]:
     st.session_state["authenticated"] = True
 
-# --- Ensure token persists in URL (Streamlit reruns) ---
 if st.session_state.get("authenticated") and st.session_state.get("session_token"):
     st.query_params["token"] = st.session_state["session_token"]
 
-    # --- Sticky URL in browser (prevents Cloud Run from wiping query params) ---
     qs = urlencode({"token": st.session_state["session_token"]})
     st.markdown(
         f"<script>window.history.replaceState(null, '', '?{qs}');</script>",
         unsafe_allow_html=True
     )
 
-# --- Login screen ---
+# login screen
 if not st.session_state["authenticated"]:
     st.title("🔒 Password Please!")
 
@@ -84,10 +79,9 @@ from docx import Document
 from docx.text.paragraph import Paragraph
 from docx.oxml import OxmlElement
 
-# =========================================================
-# CONSTANTS / SETTINGS
-# =========================================================
-# NOTE: don't include "script" here; we extract JSON-LD schema before skipping scripts during body traversal
+
+# constants and settings
+
 ALWAYS_STRIP = {"style", "noscript", "template"}
 INLINE_TAGS = {"a","span","strong","em","b","i","u","s","small","sup","sub","mark","abbr","time","code","var","kbd"}
 DEFAULT_EXCLUDE = [
@@ -101,12 +95,10 @@ DEFAULT_EXCLUDE = [
     "[class*='feefo']",
     "[class*='associated-blogs']",
     "[class*='popular']",
-    # Explore/SPA results containers and variants
     ".sr-main.js-searchpage-content.visible",
     "[class~='sr-main'][class~='js-searchpage-content'][class~='visible']",
     "[class*='js-searchpage-content']",
     "[class*='searchpage-content']",
-    # Map modal container to exclude
     ".lmd-map-modal-create.js-lmd-map-modal-map",
 ]
 DATE_TZ = "Europe/London"
@@ -126,15 +118,16 @@ NOISE_SUBSTRINGS = (
     "place this code immediately before the closing",
 )
 
+# stop special characters in h1 from breaking everything (looking at you, LS)
 def safe_filename(name: str, maxlen: int = 120) -> str:
     name = html.unescape(name)
-    name = re.sub(r"[\\/*?\"<>|:£#@!^&+=()\[\]{}]", "", name)  # strip dangerous characters
+    name = re.sub(r"[\\/*?\"<>|:£#@!^&+=()\[\]{}]", "", name)
     name = re.sub(r"\s+", " ", name)
     name = name.replace(",", "").strip()
     return (name[:maxlen] or "document").rstrip(". ")
-# =========================================================
-# UTILS
-# =========================================================
+
+# Utilities
+
 def uk_today_str() -> str:
     tz = pytz.timezone("Europe/London")
     return datetime.datetime.now(tz).strftime(DATE_FMT)
@@ -197,9 +190,9 @@ def extract_text_preserve_breaks(node: Tag | NavigableString, annotate_links: bo
                 parts.append(extract_text_preserve_breaks(child, annotate_links))
     return "".join(parts)
 
-# =========================================================
-# SCHEMA (JSON-LD) EXTRACTION
-# =========================================================
+
+# json-ld schema exctraction
+
 def extract_schema_jsonld(soup: BeautifulSoup) -> list[str]:
     """
     Collects all <script type="application/ld+json"> blocks (any casing/variants).
@@ -212,7 +205,7 @@ def extract_schema_jsonld(soup: BeautifulSoup) -> list[str]:
         if not isinstance(tag, Tag) or tag.name != "script":
             return False
         t = (tag.get("type") or "").lower()
-        return "ld+json" in t  # matches 'application/ld+json', '...; charset=utf-8', etc.
+        return "ld+json" in t
 
     for sc in soup.find_all(is_ldjson):
         raw = (sc.string or sc.get_text() or "").strip()
@@ -228,28 +221,21 @@ def extract_schema_jsonld(soup: BeautifulSoup) -> list[str]:
     lines: list[str] = []
     for i, block in enumerate(blocks):
         if i > 0:
-            lines.append("")  # blank line between blocks
+            lines.append("")
         lines.extend(block.splitlines())
     return lines
 
-# =========================================================
-# BODY EXTRACTION (preserve blank lines, add blank before h2–h6)
-# =========================================================
+
+# html content extraction
+
 def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_img_src: bool = False) -> list[str]:
     """
-    Emit ONLY:
-      - <h1> … <h6> lines
-      - <p> lines
-      - <img alt="…"> (or <img alt="…" src="…"> when enabled) for every <img> encountered
-
-    Also:
-      - Preserves blank lines as empty strings (no '<p>').
-      - Inserts a blank line before each <h2>–<h6> to improve visual structure.
+    Extract headings, paragraphs, and image alts/srcs.
+    Also adds a few extra line breaks and stuff to make formatting nicer in the Word doc
     """
     lines: list[str] = []
 
     def emit_lines(tag_name: str, text: str):
-        # Readability: blank line before sub-headings
         if tag_name in {"h2", "h3", "h4", "h5", "h6"}:
             if not lines or lines[-1] != "":
                 lines.append("")
@@ -263,7 +249,7 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
                     continue
                 lines.append(f"<{tag_name}> {seg_stripped}")
             else:
-                lines.append("")  # real blank line
+                lines.append("")
 
     def emit_img(img_tag: Tag):
         if not isinstance(img_tag, Tag) or img_tag.name != "img":
@@ -281,14 +267,12 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
         if name in ALWAYS_STRIP or name == "script":
             return
 
-        # Headings
         if name in {"h1", "h2", "h3", "h4", "h5", "h6"}:
             txt = extract_text_preserve_breaks(tag, annotate_links)
             if txt.strip():
                 emit_lines(name, txt)
             return
 
-        # Paragraphs
         if name == "p":
             txt = tag.get_text(" ", strip=True)
             if txt.strip():
@@ -297,7 +281,6 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
                 emit_img(img)
             return
 
-        # Lists
         if name in {"ul", "ol"}:
             for li in tag.find_all("li", recursive=False):
                 txt = extract_text_preserve_breaks(li, annotate_links)
@@ -314,7 +297,6 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
                             emit_img(img)
             return
 
-        # Generic containers: group contiguous inline content; recurse into block-level children
         buf = []
         def flush_buf():
             if not buf:
@@ -342,7 +324,6 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
                     handle(child)
         flush_buf()
 
-    # Walk the body
     for child in body.children:
         if isinstance(child, (Comment, Doctype, ProcessingInstruction)):
             continue
@@ -358,7 +339,6 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
             else:
                 handle(child)
 
-    # Deduplicate trivial adjacent repeats but KEEP blank lines (collapse runs of blanks)
     deduped: list[str] = []
     for ln in lines:
         if ln == "":
@@ -369,14 +349,12 @@ def extract_signposted_lines_from_body(body: Tag, annotate_links: bool, include_
             deduped.append(ln)
     return deduped
 
-# =========================================================
-# REMOVE BEFORE FIRST H1 (robust)
-# =========================================================
+
+# settings to remove everything before first h1
+
 def remove_before_first_h1_all_levels(body: Tag) -> None:
     """
-    Remove *all* nodes that appear before the first <h1> in document order.
-    Walks the ancestor chain from <body> down to <h1>; at each level
-    removes previous siblings of the node on the path to the <h1>.
+    remove all nodes that come before the first <h1> in the body.
     """
     if body is None:
         return
@@ -401,15 +379,14 @@ def remove_before_first_h1_all_levels(body: Tag) -> None:
             except Exception:
                 continue
 
-# =========================================================
-# DOCX HELPERS (includes headers/footers)
-# =========================================================
+
+# docx helpers
+
 def iter_paragraphs_and_tables(doc: Document):
     """
     Yield every paragraph in the document body and in all headers/footers
     (including first/even-page variants), plus paragraphs inside tables.
     """
-    # Body
     for p in doc.paragraphs:
         yield p
     for tbl in doc.tables:
@@ -418,7 +395,6 @@ def iter_paragraphs_and_tables(doc: Document):
                 for p in cell.paragraphs:
                     yield p
 
-    # All sections' headers/footers
     for sec in doc.sections:
         headers = [
             getattr(sec, "header", None),
@@ -487,7 +463,6 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
     bio = io.BytesIO(template_bytes)
     doc = Document(bio)
 
-    # Replace main placeholders
     replace_placeholders_safe(doc, {
         "[PAGE]": meta.get("page", ""),
         "[DATE]": meta.get("date", ""),
@@ -502,17 +477,14 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
         "[KEYWORDS]": meta.get("keywords", ""),
     })
 
-    # Main content
     replace_placeholder_with_lines(doc, "[PAGE BODY CONTENT]", lines)
 
-    # Schema section
     if meta.get("schema_lines"):
         try:
             replace_placeholder_with_lines(doc, "[SCHEMA]", meta["schema_lines"])
         except ValueError:
             pass
     else:
-        # Remove Schema heading + placeholder if toggle is off
         for p in iter_paragraphs_and_tables(doc):
             if "Schema" in (p.text or "") or "[SCHEMA]" in (p.text or ""):
                 p.clear()
@@ -522,9 +494,9 @@ def build_docx(template_bytes: bytes, meta: dict, lines: list[str]) -> bytes:
     out.seek(0)
     return out.read()
 
-# =========================================================
-# CORE PROCESS
-# =========================================================
+
+# core scrapey stuff
+
 def first_h1_text(soup: BeautifulSoup) -> str | None:
     if not soup.body:
         return None
@@ -545,11 +517,9 @@ def process_url(
 ):
     final_url, html_bytes = fetch_html(url)
     soup = BeautifulSoup(html_bytes, "lxml")
-
-    # --- extract schema BEFORE ignoring <script> in body traversal ---
+    
     schema_lines = extract_schema_jsonld(soup)
 
-    # global strip for body processing (do NOT include 'script' here)
     for el in soup.find_all(list(ALWAYS_STRIP)):
         el.decompose()
 
@@ -563,7 +533,6 @@ def process_url(
         except Exception:
             pass
 
-    # hard-kill certain containers
     try:
         for el in body.find_all(lambda t: isinstance(t, Tag) and t.has_attr('class') and {'sr-main','js-searchpage-content','visible'}.issubset(set(t.get('class', [])))):
             el.decompose()
@@ -583,14 +552,11 @@ def process_url(
         except Exception:
             pass
 
-    # robust remove-before-h1
     if remove_before_h1:
         remove_before_first_h1_all_levels(body)
 
-    # extract signposted lines
     lines = extract_signposted_lines_from_body(body, annotate_links=annotate_links, include_img_src=include_img_src)
 
-    # meta
     head = soup.head or soup
     title = head.title.string.strip() if (head and head.title and head.title.string) else "N/A"
     meta_el = head.find("meta", attrs={"name": "description"}) if head else None
@@ -609,18 +575,9 @@ def process_url(
     }
     return meta, lines
 
-# =========================================================
-# FILENAME SAFETY
-# =========================================================
-def safe_filename(name: str, maxlen: int = 120) -> str:
-    name = re.sub(r"\s+", " ", name)
-    name = re.sub(r'[\\/*?:"<>|]+', "", name)
-    name = name.replace(",", "")
-    return (name[:maxlen]).rstrip(". ")
 
-# =========================================================
-# STYLES — Local Circular + colours + background
-# =========================================================
+# styling
+
 from base64 import b64encode
 
 APP_DIR = Path(__file__).resolve().parent
@@ -655,13 +612,11 @@ for weight, paths in CANDIDATES.items():
         )
         have_weight.add(weight)
 
-# 1) Inject only the @font-face rules
 if faces_css:
     st.markdown("<style>\n" + "".join(faces_css) + "</style>", unsafe_allow_html=True)
 else:
     st.info("Add Circular WOFF2 (book=400, bold=700) under assets/fonts/ or assets/ to enable local fonts.")
 
-# 2) Theme CSS (plain string; no f-strings so braces are safe)
 force_bold_line = ""
 if 400 not in have_weight and 700 in have_weight:
     force_bold_line = "  font-weight: 700;\n"
@@ -704,12 +659,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# =========================================================
-# APP UI (Single URL only)
-# =========================================================
+
+# UI (janky). Shoutout to ChatGPT for basically doing this for me.
+
 st.title("Recmatic")
 
-# stable downloads across reruns
 if "single_docx" not in st.session_state:
     st.session_state.single_docx = None
     st.session_state.single_docx_name = None
@@ -719,7 +673,7 @@ with st.sidebar:
         if st.button("Logout"):
             st.session_state["authenticated"] = False
             st.session_state["session_token"] = None
-            st.query_params.clear()  # clears token from URL
+            st.query_params.clear()
             st.rerun()
     st.header("Template & Options")
     tpl_file = st.file_uploader("Upload Template as .DOCX file", type=["docx"])
@@ -738,7 +692,7 @@ with st.sidebar:
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             )
     else:
-        st.info("Uh oh, we can't find the Word template. Please contact the dev team to get this reuploaded.")
+        st.info("Hmm... we can't seem to find the Word template.")
     st.caption("Once downloaded, you'll still need to upload your template above.")
 
     st.divider()
@@ -765,7 +719,7 @@ with st.sidebar:
 
     st.divider()
     
-# Optional: Version display at the bottom of the sidebar
+# version display
     try:
         with open("VERSION.txt", "r") as f:
             version = f.read().strip()
@@ -778,11 +732,10 @@ with st.sidebar:
 with st.expander("Add Keywords (BETA)", expanded=False):
     st.caption("Add keywords and search volumes. The whole script needs to re-run each time you click the + or - buttons, so please be a bit gentle. You may need to click each button more than once, but please don't just hammer them like a lunatic.")
 
-    # --- Keyword Row Count ---
+
     default_row_count = len(st.session_state.get("keywords_list", [])) or 1
     row_count = st.number_input("How many keywords do you need to add? (Max 10)", min_value=1, max_value=10, step=1, value=default_row_count)
 
-    # --- Initialise or Trim keywords_list ---
     existing = st.session_state.get("keywords_list", [])
     while len(existing) < row_count:
         existing.append({"keyword": "", "volume": ""})
@@ -790,7 +743,6 @@ with st.expander("Add Keywords (BETA)", expanded=False):
         existing = existing[:row_count]
     st.session_state.keywords_list = existing
 
-    # --- Render input fields ---
     new_keywords = []
     for idx, pair in enumerate(st.session_state.keywords_list):
         col1, col2 = st.columns([3, 1])
@@ -802,14 +754,13 @@ with st.expander("Add Keywords (BETA)", expanded=False):
 
     st.session_state.keywords_list = new_keywords
 
-# --- Sort keywords by search volume (highest → lowest) ---
 def parse_volume(vol) -> int:
     s = str(vol).strip().lower().replace(",", "")
     mult = 1
-    if s.endswith("k"):  # e.g. 1.2k → 1200
+    if s.endswith("k"): 
         mult = 1000
         s = s[:-1]
-    elif s.endswith("m"):  # e.g. 2m → 2,000,000
+    elif s.endswith("m"):  
         mult = 1_000_000
         s = s[:-1]
     try:
@@ -826,13 +777,11 @@ sorted_keywords = sorted(
     reverse=True,
 )
 
-# --- Format for template ---
 formatted_keywords = ", ".join(
     f"{item['keyword']} ({item['volume']})"
     for item in sorted_keywords
 )
 
-# Agency / Client fields just above the URL field
 col0a, col0b = st.columns([1, 1])
 with col0a:
     client_name = st.text_input("Client Name", value="", placeholder="e.g., LeShuttle")
@@ -852,7 +801,7 @@ with col_b:
 
 if do_preview or do_doc:
     if not tpl_file and do_doc:
-        st.error("Aaaaaah!!! Something went wrong! Panic! - oh wait, it's fine - you just forgot to upload the template file. Read the stuff on the left if you're stuck :)")
+        st.error("You need to upload a template file first! If you need one, you can download a pre-formatted example on the left. Then, upload your template file above that section.")
     else:
         try:
             meta, lines = process_url(
@@ -865,7 +814,7 @@ if do_preview or do_doc:
 
             meta["agency"] = agency_name.strip()
             meta["client_name"] = client_name.strip()
-            meta["keywords"] = formatted_keywords  # Inject into [KEYWORDS]
+            meta["keywords"] = formatted_keywords
 
             if not include_schema:
                 meta["schema_lines"] = []
@@ -893,7 +842,6 @@ if do_preview or do_doc:
             st.exception(e)
 
 
-# render download button if we have a generated file
 if st.session_state.single_docx:
     st.download_button(
         "Download DOCX",
